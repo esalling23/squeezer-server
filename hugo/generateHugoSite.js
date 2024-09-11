@@ -4,7 +4,7 @@ const path = require('path');
 
 // Function to update or generate Hugo site
 const generateOrUpdateHugoSite = (site, next) => {
-  const hugoContentPath = `./server/hugo/sites/${site.pageTitle.replace(' ', '_')}`;
+  const hugoContentPath = `./hugo/sites/${site.subdomain}`;
   
   // Check if the site already exists
   if (fs.existsSync(hugoContentPath)) {
@@ -39,14 +39,14 @@ heroImage: "${site.heroImage}"
 
   fs.writeFileSync(contentPath, pageMarkdown);
 
-  exec(`cp -r ./server/hugo/template/* ${hugoContentPath}/`, (err) => {
+  exec(`cp -r ./hugo/template/* ${hugoContentPath}/`, (err) => {
     if (err) {
       console.error(`Error copying template: ${err.message}`);
       next(err);
       return;
     }
 
-    exec(`hugo -s ${hugoContentPath}`, (buildErr) => {
+    exec(`hugo --minify -s ${hugoContentPath}`, (buildErr) => {
       if (buildErr) {
         console.error(`Error building site: ${buildErr.message}`);
         next(buildErr);

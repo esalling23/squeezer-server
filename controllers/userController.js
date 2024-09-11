@@ -27,7 +27,8 @@ const signUp = (req, res, next) => {
 			data: {
 				email: req.body.email,
 				password: hash
-			}
+			},
+			select: { id: true, email: true, token: true }
 		}))
     .then(user => res.status(201).json({ user }))
     .catch(next)
@@ -37,7 +38,7 @@ const signIn = (req, res, next) => {
   const pw = req.body.password
   let user
 
-	// console.log(req.user);
+	console.log(req.body);
 
   User.findUnique({ where: { email: req.body.email } })
     .then(record => {
@@ -54,7 +55,8 @@ const signIn = (req, res, next) => {
 					where: { id: user.id },
 					data: {
 						token,
-					}
+					},
+					select: { id: true, email: true, token: true }
 				});
       } else {
         throw new BadCredentialsError()
@@ -68,7 +70,7 @@ const signIn = (req, res, next) => {
 
 const changePassword = (req, res, next) => {
   let user
-  User.findById(req.user.id)
+  User.findUnique({ where: { id: req.user.id } })
     .then(record => { user = record })
     .then(() => bcrypt.compare(req.body.passwords.old, user.hashedPassword))
     .then(correctPassword => {
@@ -78,8 +80,11 @@ const changePassword = (req, res, next) => {
     })
     .then(() => bcrypt.hash(req.body.passwords.new, bcryptSaltRounds))
     .then(hash => {
-      user.hashedPassword = hash
-      return user.save()
+      return User.update({
+				where: { id: user.id },
+				data: { password: hash },
+				select: { id: true, email: true, token: true }
+			})
     })
     .then(() => res.sendStatus(204))
     .catch(next)

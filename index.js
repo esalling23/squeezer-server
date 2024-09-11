@@ -11,7 +11,7 @@ const requireToken = require('./middleware/requireToken');
 const errorHandler = require('./lib/errorHandler');
 
 const serverDevPort = 8080
-const clientDevPort = 3001
+const clientDevPort = 3000
 const PORT = process.env.PORT || serverDevPort;
 
 const app = express();

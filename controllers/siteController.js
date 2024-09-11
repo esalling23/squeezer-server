@@ -5,7 +5,8 @@ const generateOrUpdateHugoSite = require('../hugo/generateHugoSite');
 // Create a new site
 const createSite = async (req, res, next) => {
   try {
-    const { pageTitle, subdomain } = req.body;
+    const { pageTitle } = req.body;
+		const subdomain = pageTitle.replace(/[^0-9a-zA-Z]/g, '')
 
     // Upload heroImage to Cloudinary
     // const heroImage = req.file ? req.file.path : null;
@@ -14,7 +15,7 @@ const createSite = async (req, res, next) => {
       data: {
         pageTitle,
 				subdomain,
-        heroImage: '',
+        heroImage: req.file?.path || '',
         // dataCollectionTypes: dataCollectionTypes.split(','),
         userId: req.user.id,  // Attach site to the authenticated user
       },
@@ -44,7 +45,7 @@ const getMySites = async (req, res, next) => {
   try {
     const sites = await prisma.site.findMany({
       where: {
-        userId: req.user.uid,  // Filter by authenticated user
+        userId: req.user.id,  // Filter by authenticated user
       },
     });
     res.status(200).json(sites);
@@ -57,13 +58,15 @@ const getMySites = async (req, res, next) => {
 const updateSite = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { pageTitle, subdomain, heroImage } = req.body;
+    const { pageTitle, heroImage } = req.body;
 
     // Check ownership
     const site = await prisma.site.findUnique({
       where: { id: parseInt(id) },
       include: { user: true }
     });
+		console.log(site)
+		console.log(site.user, req.user)
     if (!site || site.userId !== req.user.id) {
       return next(new Error('You are not authorized to update this site.'));
     }
@@ -76,7 +79,7 @@ const updateSite = async (req, res, next) => {
       data: {
         pageTitle,
         heroImage,
-				subdomain,
+				subdomain: pageTitle.replace(/[^0-9a-zA-Z]/g, ''),
         // dataCollectionTypes: dataCollectionTypes ? dataCollectionTypes.split(',') : undefined,
       },
     });
