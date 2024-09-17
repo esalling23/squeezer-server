@@ -38,7 +38,7 @@ const signIn = (req, res, next) => {
   const pw = req.body.password
   let user
 
-	console.log(req.body);
+	// console.log(req.body);
 
   User.findUnique({ where: { email: req.body.email } })
     .then(record => {
