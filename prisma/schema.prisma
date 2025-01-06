@@ -16,7 +16,7 @@ model User {
   id       Int       @id @default(autoincrement())
   email    String    @unique
 	password String
-	token 	 String?	
+	token 	 String?
   sites    Site[]
 }
 
@@ -28,7 +28,35 @@ model Site {
   dataCollectionTypes String[]
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
+
   userId             Int
   user               User      @relation(fields: [userId], references: [id])
+	
+	themeId						 Int			 @unique
+	theme							 Theme     @relation(fields: [themeId], references: [id])
+
+	collectedLeads     Lead[]
+}
+
+model Theme {
+	id                 Int       @id @default(autoincrement())
+	site 							 Site?
+	
+	primaryBrandColor	   String?
+	headingTextColor   String?
+	bodyTextColor	     String?
+
+	headingTextFont    String?
+	bodyTextFont       String?
+}
+
+model Lead {
+	id                 Int       @id @default(autoincrement())
+
+	fullName					 String
+	email							 String    @unique
+
+	collectedFromSiteId Int
+	collectedFromSite   Site @relation(fields: [collectedFromSiteId], references: [id])
 }
 
