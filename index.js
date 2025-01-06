@@ -43,11 +43,9 @@ app.use(flash());
 
 app.use(auth);
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../client/build')));
-
-// Routes
+app.use('/api/templates', requestLogger, express.static(path.join(__dirname, '11ty/templates')));
 app.use('/api/sites', requireToken, requestLogger, require('./routes/siteRoutes'));
+app.use('/api/leads/:siteId', requestLogger, require('./routes/leadRoutes'));
 app.use('/auth', requestLogger, require('./routes/userRoutes'));
 
 // Catch-all handler to serve the React app
