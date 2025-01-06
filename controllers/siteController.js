@@ -1,28 +1,40 @@
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
+const path = require('path');
+
 const prisma = require('../lib/prismaClient');
-const { cloudinary } = require('../lib/cloudinaryService');
-// const generateOrUpdateHugoSite = require('../lib/generateHugoSite');
 const generateOrUpdate11tySite = require('../lib/generate11tySite');
+const { extractCssVariables, convertKeysToCamelCase } = require('../lib/customStyles');
 
 // Create a new site
 const createSite = async (req, res, next) => {
   try {
-		
-		// Upload heroImage to Cloudinary
-    // const heroImage = req.file ? req.file.path : null;
-		
 		const subdomain = uuidv4();
+
+		const templateName = 'template1'
+		const themePath = path.join(__dirname, `../11ty/templates/${templateName}/styles/variables.css`)
+		const templateTheme = fs.readFileSync(themePath, 'utf8');
+		const themeStylesObj = convertKeysToCamelCase(
+			extractCssVariables(templateTheme)
+		)
+
 		const site = await prisma.site.create({
 			data: {
 				subdomain,
 				pageTitle: 'New Page',
 				heroImage: '',
 				// dataCollectionTypes: dataCollectionTypes.split(','),
-				userId: req.user.id,  // Attach site to the authenticated user
+				user: { connect: { id: req.user.id } },  // Attach site to the authenticated user
+				theme: {
+					create: themeStylesObj,
+					// userId: req.user.id
+				}
 			},
 		});
 
-		res.locals.site = site;
+		// site.styles = themeStylesObj
+
+		await generateOrUpdate11tySite(site);
 
     res.status(201).json(site);
   } catch (error) {
@@ -31,7 +43,7 @@ const createSite = async (req, res, next) => {
 };
 
 // Get all public sites
-const getAllSites = async (req, res) => {
+const getAllSites = async (req, res, next) => {
   try {
     const sites = await prisma.site.findMany();
     res.status(200).json(sites);
@@ -40,10 +52,25 @@ const getAllSites = async (req, res) => {
   }
 };
 
-// Get one site by its subdomain
-const getSubdomainSite = async (req, res) => {
+// Get one site by its id
+const getSite = async (req, res, next) => {
   try {
-		const { subdomain } = req.body;
+		const { id } = req.params;
+		console.log(req.params)
+    const site = await prisma.site.findUnique({
+			where: { id: parseInt(id) },
+			include: { theme: true }
+		});
+    res.status(200).json(site);
+  } catch (error) {
+    next(error)
+  }
+};
+
+// Get one site by its subdomain
+const getSubdomainSite = async (req, res, next) => {
+  try {
+		const { subdomain } = req.params;
     const site = await prisma.site.findUnique({
 			where: { subdomain }
 		});
@@ -71,30 +98,36 @@ const getMySites = async (req, res, next) => {
 const updateSite = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { pageTitle, subdomain } = req.body;
+    const { pageTitle, subdomain, style } = req.body;
 
     // Check ownership
     const site = await prisma.site.findUnique({
       where: { id: parseInt(id) },
       include: { user: true }
     });
-		// console.log(site)
-		// console.log(site.user, req.user)
+		
     if (!site || site.userId !== req.user.id) {
       return next(new Error('You are not authorized to update this site.'));
     }
 
+		await prisma.theme.update({
+			where: { id: site.themeId },
+			data: {
+				...(style.primaryBrandColor && { primaryBrandColor: style.primaryBrandColor } )
+			}
+		})
+
     const updatedSite = await prisma.site.update({
       where: { id: parseInt(id) },
       data: {
-        pageTitle: pageTitle || site.pageTitle,
-        heroImage: req.file?.path || site.heroImage,
-				subdomain: subdomain || site.subdomain,
+				...(pageTitle && { pageTitle }),
+				...(req.file && { heroImage: req.file?.path }),
+				...(subdomain && { subdomain }),
         // dataCollectionTypes: dataCollectionTypes ? dataCollectionTypes.split(',') : undefined,
       },
     });
 
-		console.log(updatedSite);
+		console.log({updatedSite});
 
 		await generateOrUpdate11tySite(updatedSite);
 
@@ -105,7 +138,7 @@ const updateSite = async (req, res, next) => {
 };
 
 // Delete a site (only if the user owns it)
-const deleteSite = async (req, res) => {
+const deleteSite = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -127,6 +160,7 @@ const deleteSite = async (req, res) => {
 
 module.exports = {
 	createSite,
+	getSite,
 	getMySites,
 	getAllSites,
 	updateSite,
