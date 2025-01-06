@@ -19,7 +19,21 @@ const PORT = process.env.PORT || serverDevPort;
 
 const app = express();
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || `http://localhost:${clientDevPort}` }))
+
+if (process.env.ENV === 'production') {
+	const allowedOrigins = [process.env.CLIENT_ORIGIN, '*.squeezer.eronsalling.me']
+	app.use(cors({ 
+		origin: (origin, callback) => {
+			if (allowedOrigins.includes(origin) || !origin) {
+					callback(null, true);
+			} else {
+					callback(new Error('Not allowed by CORS'));
+			}
+	} 
+}))
+} else {
+	app.use(cors())
+}
 
 // Middleware
 app.use(express.json());
