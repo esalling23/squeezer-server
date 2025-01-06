@@ -48,7 +48,7 @@ app.use('/api/sites', requireToken, requestLogger, require('./routes/siteRoutes'
 app.use('/api/leads/:siteId', requestLogger, require('./routes/leadRoutes'));
 app.use('/auth', requestLogger, require('./routes/userRoutes'));
 
-// Catch-all handler to serve the React app
+app.use(express.static(path.join(__dirname, '../client/build')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
