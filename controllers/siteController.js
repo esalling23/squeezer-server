@@ -98,8 +98,8 @@ const getMySites = async (req, res, next) => {
 const updateSite = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { pageTitle, subdomain, style } = req.body;
-
+    const { pageTitle, tagline, subdomain, style } = req.body;
+    
     // Check ownership
     const site = await prisma.site.findUnique({
       where: { id: parseInt(id) },
@@ -121,6 +121,7 @@ const updateSite = async (req, res, next) => {
       where: { id: parseInt(id) },
       data: {
 				...(pageTitle && { pageTitle }),
+				...(tagline && { tagline }),
 				...(req.file && { heroImage: req.file?.path }),
 				...(subdomain && { subdomain }),
         // dataCollectionTypes: dataCollectionTypes ? dataCollectionTypes.split(',') : undefined,

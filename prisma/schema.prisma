@@ -23,7 +23,8 @@ model User {
 model Site {
   id                 Int       @id @default(autoincrement())
   pageTitle          String
-  heroImage          String
+  tagline            String?
+  heroImage          String?
   subdomain          String		 @unique
   dataCollectionTypes String[]
   createdAt          DateTime  @default(now())
