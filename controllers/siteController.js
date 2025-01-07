@@ -4,7 +4,7 @@ const path = require('path');
 
 const prisma = require('../lib/prismaClient');
 const generateOrUpdate11tySite = require('../lib/generate11tySite');
-const { extractCssVariables, convertKeysToCamelCase } = require('../lib/customStyles');
+const { extractCssVariables, transformKeys } = require('../lib/customStyles');
 
 // Create a new site
 const createSite = async (req, res, next) => {
@@ -14,7 +14,7 @@ const createSite = async (req, res, next) => {
 		const templateName = 'template1'
 		const themePath = path.join(__dirname, `../11ty/templates/${templateName}/styles/variables.css`)
 		const templateTheme = fs.readFileSync(themePath, 'utf8');
-		const themeStylesObj = convertKeysToCamelCase(
+		const themeStylesObj = transformKeys(
 			extractCssVariables(templateTheme)
 		)
 
@@ -30,9 +30,8 @@ const createSite = async (req, res, next) => {
 					// userId: req.user.id
 				}
 			},
+      include: { theme: true }
 		});
-
-		// site.styles = themeStylesObj
 
 		await generateOrUpdate11tySite(site);
 
@@ -110,10 +109,17 @@ const updateSite = async (req, res, next) => {
       return next(new Error('You are not authorized to update this site.'));
     }
 
+    
+    const parsedStyles = JSON.parse(style)
+
 		await prisma.theme.update({
 			where: { id: site.themeId },
 			data: {
-				...(style.primaryBrandColor && { primaryBrandColor: style.primaryBrandColor } )
+				...(parsedStyles.primaryBrandColor && { primaryBrandColor: parsedStyles.primaryBrandColor } ),
+				...(parsedStyles.headingTextColor && { headingTextColor: parsedStyles.headingTextColor } ),
+				...(parsedStyles.bodyTextColor && { bodyTextColor: parsedStyles.bodyTextColor } ),
+				...(parsedStyles.headingTextFont && { headingTextFont: parsedStyles.headingTextFont } ),
+				...(parsedStyles.bodyTextFont && { bodyTextFont: parsedStyles.bodyTextFont } ),
 			}
 		})
 
@@ -126,6 +132,17 @@ const updateSite = async (req, res, next) => {
 				...(subdomain && { subdomain }),
         // dataCollectionTypes: dataCollectionTypes ? dataCollectionTypes.split(',') : undefined,
       },
+      include: {
+        theme: { 
+          select: {
+            primaryBrandColor: true,
+            headingTextColor: true,
+            bodyTextColor: true,
+            headingTextFont: true,
+            bodyTextFont: true,
+          }
+        }
+      }
     });
 
 		console.log({updatedSite});
