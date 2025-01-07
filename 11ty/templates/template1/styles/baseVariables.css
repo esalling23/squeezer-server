@@ -1,0 +1,10 @@
+:root {
+  --default-background: white;
+  --primary-brand-color: orange;
+
+  --body-text-color: #434343;
+  --heading-text-color: var(--primary-brand-color);
+
+  --body-text-font: Georgia, serif;
+  --heading-text-font: "Gill Sans", sans-serif;
+}
