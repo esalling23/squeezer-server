@@ -1,23 +1,42 @@
+/* Shared styles used by deployed site & site preview */
+
 :root {
 	--default-background: white;
 }
 
+body {
+  font-family: var(--body-text-font);
+  color: var(--body-text-color);
+
+  font-size: 12px;
+}
+
+h1, h2 {
+  font-family: var(--heading-text-font);
+  color: var(--heading-text-color);
+
+  margin: 1rem 0 !important;
+}
+
+h3, h4, h5, p, input {
+  font-family: var(--body-text-font);
+  color: var(--body-text-color);
+}
+
 .site {
 	display: flex;
-	height: 100%;
+	height: fit-content;
+  max-height: 100%;
 	width: 100%;
-	overflow: hidden;
+	overflow-y: scroll;
 	background: var(--primary-brand-color);
 	flex-direction: column;
-	justify-content: center;
+	justify-content: space-around;
 	align-items: center;
 }
 
-.site h2 {
-	font-size: 1.2rem;
-}
-
 .site section.main {
+  margin: 6rem auto;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -26,7 +45,7 @@
 	width: 100%;
 	min-width: 300px;
 	max-width: 600px;
-	height: auto;
+	height: fit-content;
 	background-color: var(--default-background);
 	border-radius: 20px;
 }
