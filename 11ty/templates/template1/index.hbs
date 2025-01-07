@@ -8,6 +8,17 @@
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">            
 	
+    {{!-- Google Fonts support --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    {{!-- Custom font links --}}
+    {{#if fontLinks.length}}
+      {{#each fontLinks}} 
+      {{#if this}}<link rel="stylesheet" href="{{this}}" />{{/if}}
+      {{/each}}
+    {{/if}}
+
 		<link rel="stylesheet" href="styles/baseVariables.css">
 		<link rel="stylesheet" href="styles/userVariables.css">
 		<link rel="stylesheet" href="styles/index.css">

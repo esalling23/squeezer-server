@@ -98,7 +98,7 @@ const updateSite = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { pageTitle, tagline, subdomain, style } = req.body;
-    
+
     // Check ownership
     const site = await prisma.site.findUnique({
       where: { id: parseInt(id) },
@@ -112,14 +112,29 @@ const updateSite = async (req, res, next) => {
     
     const parsedStyles = JSON.parse(style)
 
+    // Future work - link to existing fonts if user selects one of those?
+    const getFontLink = fontObj => ({
+      create: {
+        family: fontObj.family,
+        ...(fontObj.url && { url: fontObj.url })
+      }
+    })
+
 		await prisma.theme.update({
 			where: { id: site.themeId },
 			data: {
+        // Colors
 				...(parsedStyles.primaryBrandColor && { primaryBrandColor: parsedStyles.primaryBrandColor } ),
 				...(parsedStyles.headingTextColor && { headingTextColor: parsedStyles.headingTextColor } ),
 				...(parsedStyles.bodyTextColor && { bodyTextColor: parsedStyles.bodyTextColor } ),
-				...(parsedStyles.headingTextFont && { headingTextFont: parsedStyles.headingTextFont } ),
-				...(parsedStyles.bodyTextFont && { bodyTextFont: parsedStyles.bodyTextFont } ),
+				
+        // Fonts
+        ...(parsedStyles.headingTextFont && { 
+          headingTextFont: getFontLink(parsedStyles.headingTextFont)
+        } ),
+				...(parsedStyles.bodyTextFont && { 
+          bodyTextFont: getFontLink(parsedStyles.bodyTextFont)
+        } ),
 			}
 		})
 
