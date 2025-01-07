@@ -12,52 +12,65 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-	password String
-	token 	 String?
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  password String
+  token    String?
   sites    Site[]
 }
 
 model Site {
-  id                 Int       @id @default(autoincrement())
-  pageTitle          String
-  tagline            String?
-  heroImage          String?
-  subdomain          String		 @unique
+  id                  Int      @id @default(autoincrement())
+  pageTitle           String
+  tagline             String?
+  heroImage           String?
+  subdomain           String   @unique
   dataCollectionTypes String[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
-  userId             Int
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-	
-	themeId						 Int			 @unique
-	theme							 Theme     @relation(fields: [themeId], references: [id], onDelete: Cascade)
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-	collectedLeads     Lead[]
+  themeId Int   @unique
+  theme   Theme @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  collectedLeads Lead[]
 }
 
 model Theme {
-	id                 Int       @id @default(autoincrement())
-	site 							 Site?
-	
-	primaryBrandColor	   String?
-	headingTextColor   String?
-	bodyTextColor	     String?
+  id   Int   @id @default(autoincrement())
+  site Site?
 
-	headingTextFont    String?
-	bodyTextFont       String?
+  primaryBrandColor String?
+  headingTextColor  String?
+  bodyTextColor     String?
+
+  headingTextFont Font? @relation("ThemeHeadingFont", fields: [headingFontId], references: [id])
+  headingFontId   Int?
+
+  bodyTextFont Font? @relation("ThemeBodyFont", fields: [bodyFontId], references: [id])
+  bodyFontId   Int?
+}
+
+model Font {
+  id Int @id @default(autoincrement())
+
+  family String
+  url    String?
+
+  usedInThemesHeading Theme[] @relation("ThemeHeadingFont")
+  usedInThemesBody    Theme[] @relation("ThemeBodyFont")
 }
 
 model Lead {
-	id                 Int       @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-	fullName					 String
-	email							 String    @unique
+  fullName String
+  email    String @unique
 
-	collectedFromSiteId Int
-	collectedFromSite   Site @relation(fields: [collectedFromSiteId], references: [id], onDelete: Cascade)
+  collectedFromSiteId Int
+  collectedFromSite   Site @relation(fields: [collectedFromSiteId], references: [id], onDelete: Cascade)
 }
-
