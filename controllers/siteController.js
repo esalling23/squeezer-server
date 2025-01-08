@@ -12,7 +12,7 @@ const createSite = async (req, res, next) => {
 		const subdomain = uuidv4();
 
 		const templateName = 'template1'
-		const themePath = path.join(__dirname, `../11ty/templates/${templateName}/styles/variables.css`)
+		const themePath = path.join(__dirname, `../11ty/templates/${templateName}/styles/userVariables.css`)
 		const templateTheme = fs.readFileSync(themePath, 'utf8');
 		const themeStylesObj = transformKeys(
 			extractCssVariables(templateTheme)
@@ -179,7 +179,7 @@ const deleteSite = async (req, res, next) => {
       where: { id: parseInt(id) },
       include: { user: true }
     });
-    if (!site || site.userId !== req.user.uid) {
+    if (!site || site.userId !== req.user.id) {
       return res.status(403).json({ error: 'You are not authorized to delete this site.' });
     }
 
