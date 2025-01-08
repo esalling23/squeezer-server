@@ -4,35 +4,41 @@
 	--default-background: white;
 }
 
-body {
+.site {
+  height: fit-content;
+  max-height: 100%;
+	width: 100%;
+
+	overflow-y: scroll;
+  
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+  
+	background: var(--primary-brand-color);
   font-family: var(--body-text-font);
   color: var(--body-text-color);
 
   font-size: 12px;
 }
 
-h1, h2 {
+.site h1, .site h2 {
   font-family: var(--heading-text-font);
   color: var(--heading-text-color);
 
   margin: 1rem 0 !important;
 }
 
-h3, h4, h5, p, input {
+.site h3, .site h4, .site h5, .site p, .site input {
   font-family: var(--body-text-font);
   color: var(--body-text-color);
+  margin: 0.5rem 0 !important;
 }
 
-.site {
-	display: flex;
-	height: fit-content;
-  max-height: 100%;
-	width: 100%;
-	overflow-y: scroll;
-	background: var(--primary-brand-color);
-	flex-direction: column;
-	justify-content: space-around;
-	align-items: center;
+
+.site .container {
+  margin-top: 2rem;
 }
 
 .site section.main {
@@ -52,5 +58,5 @@ h3, h4, h5, p, input {
 
 .site section.main img {
 	width: 100%;
-	height: auto;
+	height: 30vh;
 }
