@@ -58,7 +58,9 @@ const getSite = async (req, res, next) => {
 		console.log(req.params)
     const site = await prisma.site.findUnique({
 			where: { id: parseInt(id) },
-			include: { theme: true }
+			include: { theme: {
+        include: { headingTextFont: true, bodyTextFont: true }
+      } }
 		});
     res.status(200).json(site);
   } catch (error) {
