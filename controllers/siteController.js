@@ -129,10 +129,10 @@ const updateSite = async (req, res, next) => {
 				...(parsedStyles.bodyTextColor && { bodyTextColor: parsedStyles.bodyTextColor } ),
 				
         // Fonts
-        ...(parsedStyles.headingTextFont && { 
+        ...(parsedStyles.headingTextFont?.family && { 
           headingTextFont: getFontLink(parsedStyles.headingTextFont)
         } ),
-				...(parsedStyles.bodyTextFont && { 
+				...(parsedStyles.bodyTextFont?.family && { 
           bodyTextFont: getFontLink(parsedStyles.bodyTextFont)
         } ),
 			}
@@ -149,18 +149,15 @@ const updateSite = async (req, res, next) => {
       },
       include: {
         theme: { 
-          select: {
-            primaryBrandColor: true,
-            headingTextColor: true,
-            bodyTextColor: true,
+          include: {
             headingTextFont: true,
-            bodyTextFont: true,
+            bodyTextFont: true
           }
         }
       }
     });
 
-		console.log({updatedSite});
+		console.log({...updatedSite.theme});
 
 		await generateOrUpdate11tySite(updatedSite);
 
