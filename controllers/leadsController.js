@@ -11,19 +11,16 @@ const createLead = async (req, res, next) => {
 		const data = {
 			email: req.body.email,
 			fullName: req.body.fullName,
-			collectedFromSite: { connect: { 
-				id: parseInt(req.params.siteId)
-			} }
+			collectedFromSite: { 
+        connect: { 
+          id: parseInt(req.params.siteId)
+        } 
+      }
 		}
 
-		console.log(data);
 		const lead = await prisma.lead.create({
 			data,
 		});
-
-		console.log('lead created', lead)
-
-		// Tell the client, in case the LeadView is open
 
     res.status(201).json(lead);
   } catch (error) {
@@ -31,7 +28,7 @@ const createLead = async (req, res, next) => {
   }
 };
 
-// Get all public sites
+// Get all public leads
 const getAllLeads = async (req, res, next) => {
   try {
 		const { siteId } = req.params;
