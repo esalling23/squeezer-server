@@ -25,12 +25,12 @@ if (process.env.ENV === 'production') {
 	app.use(cors({ 
 		origin: (origin, callback) => {
 			if (allowedOrigins.includes(origin) || !origin) {
-					callback(null, true);
+        callback(null, true);
 			} else {
-					callback(new Error('Not allowed by CORS'));
+        callback(new Error('Not allowed by CORS'));
 			}
-	} 
-}))
+    } 
+  }))
 } else {
 	app.use(cors())
 }
@@ -47,6 +47,12 @@ app.use('/api/templates', requestLogger, express.static(path.join(__dirname, '11
 app.use('/api/sites', requireToken, requestLogger, require('./routes/siteRoutes'));
 app.use('/api/leads/:siteId', requestLogger, require('./routes/leadRoutes'));
 app.use('/auth', requestLogger, require('./routes/userRoutes'));
+
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+if (process.env.ENV === 'dev') {
+  app.use('/live', express.static(path.join(__dirname, '../sites')));
+}
 
 app.use(express.static(path.join(__dirname, '../client/build')));
 app.get('*', (req, res) => {

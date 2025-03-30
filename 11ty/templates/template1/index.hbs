@@ -6,7 +6,7 @@
 		<title>{{ site.pageTitle }}</title>
 
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">            
+		<link href="{{ serverUrl }}/public/materialize.css" rel="stylesheet">
 	
     {{!-- Google Fonts support --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +24,7 @@
 		<link rel="stylesheet" href="styles/index.css">
 		<link rel="stylesheet" href="styles/site.css">
 	</head>
-	<body style="">
+	<body>
 		<div class="site">
 			<section class="main">
 				{{#if site.heroImage}}
@@ -37,13 +37,7 @@
 				<h4>{{ site.tagline }}</h4>
 				{{/if}}
 
-				{{!-- {{#if site.dataCollectionTypes}}
-					{{site.dataCollectionTypes}}
-				{{/if}} --}}
 				<div class="container mt-2">
-
-					<h6 class="left-align">Submit Your Information</h6>
-
 					<form id="leadForm">
 						<div class="input-field">
 							<input type="text" id="fullName" required>
@@ -60,20 +54,20 @@
 				</div>
 			</section>
 		</div>
-
-
+    
     <script>
 				function getApiUrl() {
 					let url = 'https://squeezer.eronsalling.me';
 
-					// if (window.location.hostname === 'localhost') {
+					if (window.location.hostname === 'localhost') {
 						url = 'http://localhost:8080'
-					// }
+					}
 
 					return url;
 				}
-        document.getElementById('leadForm').addEventListener('submit', async function(event) {
-            console.log('lead form submit')
+        document
+          .getElementById('leadForm')
+          .addEventListener('submit', async function(event) {
 						event.preventDefault(); // Prevent default form submission
 
             const fullName = document.getElementById('fullName').value;
@@ -82,40 +76,34 @@
             // Validate email format
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailPattern.test(email)) {
-                alert('Please enter a valid email address.');
-                return;
+              alert('Please enter a valid email address.');
+              return;
             }
 
-            // Prepare data for submission
             const data = {
-                fullName: fullName,
-                email: email
+              fullName,
+              email
             };
-
-						console.log('form data', data)
 
             try {
 							const url = getApiUrl() + '/api/leads/' + {{ site.id }};
-							console.log(url)
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
+              const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+              });
 
-								console.log(response)
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-
-                const result = await response.json();
-								console.log(response)
+              const result = await response.json();
             } catch (error) {
+              console.error(error)
             }
-        });
+          });
     </script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 	</body>

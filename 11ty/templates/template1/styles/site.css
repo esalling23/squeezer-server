@@ -60,3 +60,17 @@
 	width: 100%;
 	height: 30vh;
 }
+
+.site section.main form {
+  padding: 2rem;
+}
+
+.site section.main form .input-field .prefix.active,
+.site section.main form .input-field > label
+{
+  color: var(--primary-brand-color);
+}
+
+.site section.main form .btn {
+  background: var(--primary-brand-color);
+}
