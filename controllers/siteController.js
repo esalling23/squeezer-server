@@ -159,8 +159,6 @@ const updateSite = async (req, res, next) => {
       }
     });
 
-		console.log({...updatedSite.theme});
-
 		await generateOrUpdate11tySite(updatedSite);
 
     res.status(200).json(updatedSite);

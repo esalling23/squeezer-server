@@ -45,6 +45,7 @@ app.use(auth);
 
 app.use('/api/templates', requestLogger, express.static(path.join(__dirname, '11ty/templates')));
 app.use('/api/sites', requireToken, requestLogger, require('./routes/siteRoutes'));
+app.use('/api/fonts', requireToken, requestLogger, require('./routes/fontRoutes'));
 app.use('/api/leads/:siteId', requestLogger, require('./routes/leadRoutes'));
 app.use('/auth', requestLogger, require('./routes/userRoutes'));
 
